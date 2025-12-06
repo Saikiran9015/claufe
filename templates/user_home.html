@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>User Home - Claufe.</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+
+<body>
+
+<header class="landing-header">
+      <div class="landing-logo">
+        <img src="{{ url_for('static', filename='4.png') }}" class="logo-img" alt="Logo">
+        
+    </div>
+  <div>
+    <span style="margin-right:12px;">
+      Hi, {{ name }} ({{ role }})
+    </span>
+    <a href="{{ url_for('logout') }}" class="landing-admin-link">Logout</a>
+  </div>
+</header>
+
+<main style="max-width:800px; margin:40px auto; text-align:center;">
+
+  <h1>User Dashboard</h1>
+
+  <p style="color:#666; margin-top:10px;">
+    Welcome to your user panel. You can later add:
+    <br>• Order history  
+    <br>• Saved addresses  
+    <br>• Wishlist  
+    <br>• Profile settings  
+  </p>
+
+  <a href="{{ url_for('landing') }}" 
+     class="landing-admin-link"
+     style="margin-top:20px; display:inline-block;">
+    ← Back to Store
+  </a>
+
+</main>
+
+</body>
+</html>
