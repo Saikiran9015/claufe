@@ -323,34 +323,34 @@ def update_rating(product_id):
 # =====================================================
 # CHECKOUT (WITH ADDRESS SAVE)
 # =====================================================
+# =====================================================
+# CHECKOUT (WITH ADDRESS SAVE)
+# =====================================================
 @app.route("/checkout", methods=["GET", "POST"])
 def checkout():
     need = require_login()
     if need:
         return need
 
-    # load cart of the current user
     items = list(cart_col.find({"user_email": session["email"]}))
-
     if not items:
         flash("Your cart is empty!", "error")
         return redirect(url_for("cart"))
 
-    # calculate updated total dynamically every time
-    total = sum(float(i["price"]) * int(i["quantity"]) for i in items)
+    total = sum(float(i["price"]) * i["quantity"] for i in items)
 
-    # save address on submit (before payment)
     if request.method == "POST":
+        # normalize to address1/address2 keys used by shiprocket_create_order
         session["checkout_address"] = {
             "full_name": request.form.get("full_name"),
             "phone": request.form.get("phone"),
-            "email": request.form.get("email"),
-            "address": request.form.get("address"),
-            "pincode": request.form.get("pincode"),
+            "email": session["email"],
+            "address1": request.form.get("address"),
+            "address2": request.form.get("address2"),
             "city": request.form.get("city"),
-            "state": request.form.get("state")
+            "state": request.form.get("state"),
+            "pincode": request.form.get("pincode")
         }
-
         return redirect(url_for("checkout"))
 
     return render_template(
@@ -366,39 +366,56 @@ def checkout():
 # =====================================================
 @app.route("/create-razorpay-order", methods=["POST"])
 def create_razorpay_order():
-    data = request.get_json()
-
-    # Frontend sends RUPEES, convert to PAISA
-    amount_rupees = float(data["amount"])
-    amount_paise = int(amount_rupees * 1.00)
-
+    data = request.get_json() or {}
+    # checkout.html already sends amount in paise (TOTAL_AMOUNT = total * 100)
+    amount_paise = int(data.get("amount", 0))
     order = razorpay_client.order.create({
         "amount": amount_paise,
         "currency": "INR",
         "payment_capture": 1
     })
-
     return jsonify(order)
 
+@app.route("/save-address", methods=["POST"])
+def save_address():
+    data = request.get_json()
+
+    session["checkout_address"] = {
+        "full_name": data.get("full_name"),
+        "phone": data.get("phone"),
+        "email": data.get("email"),
+        "address1": data.get("address1"),
+        "address2": data.get("address2"),
+        "city": data.get("city"),
+        "state": data.get("state"),
+        "pincode": data.get("pincode")
+    }
+    return jsonify({"saved": True})
 
 
 # =====================================================
 # SHIPROCKET CONFIG / HELPERS
-# =====================================================
 SHIPROCKET_BASE_URL = "https://apiv2.shiprocket.in/v1/external"
 SHIPROCKET_EMAIL = os.getenv("SHIPROCKET_EMAIL")
-
+SHIPROCKET_PASSWORD = os.getenv("SHIPROCKET_PASSWORD")
 
 
 def shiprocket_login():
     url = f"{SHIPROCKET_BASE_URL}/auth/login"
     data = {
         "email": SHIPROCKET_EMAIL,
-        
+        "password": SHIPROCKET_PASSWORD,
     }
-    r = requests.post(url, json=data)
-    r.raise_for_status()
-    return r.json()["token"]
+    try:
+        r = requests.post(url, json=data)
+        print(f"Shiprocket Login Status: {r.status_code}")
+        print(f"Shiprocket Login Response: {r.text}")
+        r.raise_for_status()
+        return r.json().get("token")
+    except Exception as e:
+        print(f"Shiprocket Login Error: {e}")
+        raise
+
 
 
 def shiprocket_create_order(order, address):
@@ -409,21 +426,25 @@ def shiprocket_create_order(order, address):
         "Content-Type": "application/json"
     }
 
+    # be tolerant with address keys (address vs address1)
+    addr1 = address.get("address1") or address.get("address") or ""
+    addr2 = address.get("address2") or ""
+
     payload = {
         "order_id": str(order["_id"]),
         "order_date": datetime.datetime.now().strftime("%Y-%m-%d %H:%M"),
         "pickup_location": "Primary",
 
-        "billing_customer_name": address["full_name"],
+        "billing_customer_name": address.get("full_name", ""),
         "billing_last_name": "",
-        "billing_address": address["address1"],
-        "billing_address_2": address.get("address2", ""),
-        "billing_city": address["city"],
-        "billing_pincode": address["pincode"],
-        "billing_state": address["state"],
+        "billing_address": addr1,
+        "billing_address_2": addr2,
+        "billing_city": address.get("city", ""),
+        "billing_pincode": address.get("pincode", "") or address.get("pin", ""),
+        "billing_state": address.get("state", ""),
         "billing_country": "India",
-        "billing_email": address["email"],
-        "billing_phone": address["phone"],
+        "billing_email": address.get("email", ""),
+        "billing_phone": address.get("phone", ""),
         "shipping_is_billing": True,
 
         "order_items": [
@@ -463,7 +484,6 @@ def verify_payment():
     order_id = data.get("razorpay_order_id")
     signature = data.get("razorpay_signature")
 
-    # Signature check
     message = f"{order_id}|{payment_id}"
     generated_signature = hmac.new(
         bytes(RAZORPAY_SECRET, 'utf-8'),
@@ -474,14 +494,14 @@ def verify_payment():
     if not hmac.compare_digest(generated_signature, signature):
         return jsonify({"success": False, "redirect_url": FAILED_URL})
 
-    # Fetch items in cart
+    # CART
     items = list(cart_col.find({"user_email": session["email"]}))
     total = sum(float(i["price"]) * i["quantity"] for i in items)
 
-    # Fetch saved user address
-    address = session.get("checkout_address")
+    # ADDRESS SAVED BEFORE PAYMENT
+    address = session.get("checkout_address", {})
 
-    # Save order
+    # SAVE ORDER
     new_order_id = orders_col.insert_one({
         "user_email": session["email"],
         "items": items,
@@ -496,7 +516,7 @@ def verify_payment():
 
     order_doc = orders_col.find_one({"_id": new_order_id})
 
-    # Shiprocket
+    # CREATE SHIPROCKET ORDER
     try:
         ship_data = shiprocket_create_order(order_doc, address)
         orders_col.update_one(
@@ -504,29 +524,31 @@ def verify_payment():
             {"$set": {
                 "shiprocket_order_id": ship_data.get("order_id"),
                 "shiprocket_shipment_id": ship_data.get("shipment_id"),
-                "shiprocket_status": ship_data.get("status")
+                "shiprocket_status": ship_data.get("status"),
+                "shiprocket_response": ship_data
             }}
         )
     except Exception as e:
         print("Shiprocket Error:", e)
+        # record error on order for debugging
+        orders_col.update_one({"_id": new_order_id}, {"$set": {"shiprocket_error": str(e)}})
 
-    # Clear cart
     cart_col.delete_many({"user_email": session["email"]})
 
-    return jsonify({"success": True, "redirect_url": SUCCESS_URL})
+    # After successful verification and order save, redirect user to landing page
+    return jsonify({"success": True, "redirect_url": url_for("landing")})
 
 
 # Razorpay webhook endpoint
 @app.route("/razorpay-webhook", methods=["POST"])
 def razorpay_webhook():
-    """
-    Verify Razorpay webhook signature and update order status.
-    Configure this URL in the Razorpay dashboard:
-      https://<your-domain>/razorpay-webhook
-    """
-    payload = request.get_data()  # raw body bytes
+    print("\n=== Webhook Received ===")
+    print("Headers:", dict(request.headers))
+    print("Raw data:", request.get_data().decode('utf-8'))
+    
+    payload = request.get_data()
     signature = request.headers.get("X-Razorpay-Signature", "")
-
+    print("Signature from header:", signature)
     # verify signature
     try:
         generated_sig = hmac.new(

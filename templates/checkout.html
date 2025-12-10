@@ -139,8 +139,9 @@
             key: RAZORPAY_KEY,
             amount: order.amount,
             currency: "INR",
-            name: "Dream X Store",
+            name: "Claufe",
             description: "Order Payment",
+            image: "{{ url_for('static', filename='4 r.png') }}",
             order_id: order.id,
 
             handler: async function (response) {

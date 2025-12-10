@@ -3,15 +3,45 @@
 <head>
 <meta charset="UTF-8">
 <title>{{ p.name }}</title>
-
+<link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
 <style>
+    /* GLOBAL */
 body {
-    font-family: Poppins, sans-serif;
     margin: 0;
     background: #f5f5f7;
+    font-family: "Poppins", sans-serif;
 }
 
-/* MAIN CONTAINER */
+/* HEADER */
+.landing-header {
+    width: 100%;
+    padding: 18px 40px;
+    background: #ffffff;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 3px 12px rgba(0,0,0,0.06);
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+
+.landing-logo img {
+    width: 130px;
+}
+
+.landing-admin-link {
+    margin-left: 20px;
+    font-weight: 600;
+    color: #333;
+    text-decoration: none;
+    font-size: 16px;
+}
+.landing-admin-link:hover {
+    color: #6a35ff;
+}
+
+/* PRODUCT PAGE */
 .page-wrapper {
     width: 92%;
     max-width: 1400px;
@@ -20,7 +50,7 @@ body {
     gap: 40px;
 }
 
-/* LEFT SIDE IMAGE VIEWER */
+/* LEFT SIDE IMAGES */
 .left-view {
     flex: 1;
 }
@@ -28,123 +58,135 @@ body {
 .main-image-box {
     width: 100%;
     height: 520px;
-    border-radius: 18px;
-    overflow: hidden;
     background: #fff;
+    border-radius: 20px;
+    overflow: hidden;
     display: flex;
     justify-content: center;
     align-items: center;
 }
-
 .main-image-box img {
     width: 100%;
     height: 100%;
     object-fit: cover;
 }
 
-/* THUMBNAILS */
 .thumb-row {
     display: flex;
     gap: 12px;
-    margin-top: 12px;
+    margin-top: 18px;
 }
-
 .thumb-row img {
-    width: 85px;
-    height: 85px;
+    width: 80px;
+    height: 80px;
+    border-radius: 14px;
     object-fit: cover;
-    border-radius: 12px;
     cursor: pointer;
     border: 2px solid #ddd;
+    transition: .3s ease-in-out;
 }
-
 .thumb-row img:hover {
     border-color: #6a35ff;
+    transform: scale(1.05);
 }
 
-/* RIGHT SIDE PRODUCT INFO */
+/* RIGHT SIDE INFO */
 .right-info {
     flex: 1;
 }
 
 h1 {
-    font-size: 30px;
-    margin-top: 0;
+    margin: 0;
+    font-size: 32px;
+    font-weight: 700;
 }
 
 .price-row {
-    font-size: 26px;
-    margin: 14px 0;
-}
-
-.old-price {
-    text-decoration: line-through;
-    color: #888;
-    margin-left: 8px;
-}
-
-/* SIZE BUTTONS */
-.size-box {
-    display: flex;
-    gap: 10px;
-    margin-top: 12px;
-}
-
-.size-btn {
-    padding: 8px 18px;
-    border: 1px solid #ccc;
-    border-radius: 8px;
-    cursor: pointer;
-    background: #fff;
+    margin: 20px 0;
+    font-size: 30px;
     font-weight: 600;
 }
 
-.size-btn.active {
-    background: #6a35ff;
-    color: #fff;
-    border-color: #6a35ff;
+.old-price {
+    margin-left: 12px;
+    color: #888;
+    text-decoration: line-through;
 }
 
-/* ADD TO CART BUTTON */
-.add-btn {
-    margin-top: 20px;
-    width: 100%;
+/* SIZES */
+.size-box {
+    display: flex;
+    gap: 10px;
+    margin-top: 15px;
+}
+
+.size-btn {
+    background: #fff;
+    padding: 10px 20px;
+    border-radius: 8px;
+    border: 2px solid #ccc;
+    font-weight: 600;
+    cursor: pointer;
+    transition: .3s;
+}
+
+.size-btn.active,
+.size-btn:hover {
+    border-color: #6a35ff;
     background: #6a35ff;
     color: white;
-    border: none;
-    padding: 16px;
-    font-size: 17px;
-    border-radius: 12px;
-    cursor: pointer;
 }
 
+/* ADD BUTTON */
+.add-btn {
+    margin-top: 25px;
+    width: 100%;
+    padding: 15px;
+    border-radius: 12px;
+    border: none;
+    color: #fff;
+    background: #6a35ff;
+    font-size: 18px;
+    cursor: pointer;
+    transition: .4s;
+}
 .add-btn:hover {
     background: #5527ff;
+    transform: scale(1.03);
+}
+
+/* RESPONSIVE */
+@media screen and (max-width: 900px){
+    .page-wrapper {
+        flex-direction: column;
+    }
+    .landing-logo img {
+        width: 100px;
+    }
 }
 
 </style>
-
-<script>
-function selectSize(size) {
-    document.getElementById("selectedSize").value = size;
-
-    let btns = document.querySelectorAll(".size-btn");
-    btns.forEach(btn => btn.classList.remove("active"));
-
-    document.getElementById("btn_" + size).classList.add("active");
-}
-
-function changeImage(link) {
-    document.getElementById("mainImage").src = link;
-}
-</script>
-
 </head>
+
 <body>
+
+<header class="landing-header">
+    <div class="landing-logo">
+       <a href="{{ url_for('landing') }}">
+            <img src="{{ url_for('static', filename='3.png') }}" class="logo-img" alt="Logo">
+       </a>
+    </div>
+
+    <div>
+        <a href="{{ url_for('admin_dashboard') }}" class="landing-admin-link">Admin</a>
+        <a href="{{ url_for('cart') }}" class="landing-admin-link">Cart</a>
+    </div>
+</header>
+
 
 <div class="page-wrapper">
 
-    <!-- LEFT IMAGE VIEWER -->
+    <!-- LEFT VIEW -->
     <div class="left-view">
         <div class="main-image-box">
             <img id="mainImage" src="{{ url_for('uploaded_file', filename=p.images[0]) }}">
@@ -157,14 +199,13 @@ function changeImage(link) {
         </div>
     </div>
 
-    <!-- RIGHT INFO SIDE -->
+    <!-- RIGHT INFO -->
     <div class="right-info">
         <h1>{{ p.name }}</h1>
 
         {% if p.rating %}
         <div style="margin:6px 0; font-size:18px;">
-            <span style="color:#ffc107; font-size:20px;">⭐⭐⭐⭐</span>
-            <strong>{{ p.rating }}</strong> / 5
+            ⭐ {{ p.rating }} / 5
         </div>
         {% endif %}
 
@@ -179,34 +220,38 @@ function changeImage(link) {
             {% endif %}
         </div>
 
-        <h3>Select Size:</h3>
 
-        <div class="size-box">
-            {% for s in ["S","M","L","XL","XXL"] %}
-                {% if s in p.sizes %}
-                <button type="button"
-                        class="size-btn"
-                        id="btn_{{ s }}"
-                        onclick="selectSize('{{ s }}')">
-                    {{ s }}
-                </button>
-                {% endif %}
-            {% endfor %}
-        </div>
-
-        <!-- ADD TO CART FORM -->
         <form action="{{ url_for('add_to_cart', product_id=p._id) }}" method="POST">
+            
+            <h3>Select Size:</h3>
+            <div class="size-box">
+                {% for s in ["S","M","L","XL","XXL"] %}
+                    {% if s in p.sizes %}
+                        <button type="button" class="size-btn" id="btn_{{ s }}" onclick="selectSize('{{ s }}')">{{ s }}</button>
+                    {% endif %}
+                {% endfor %}
+            </div>
+
             <input type="hidden" name="size" id="selectedSize" value="M">
             <input type="hidden" name="quantity" value="1">
 
             <button type="submit" class="add-btn">
-                Purchase Now 
+                Purchase Now
             </button>
         </form>
-
     </div>
 
 </div>
+
+<script>
+function selectSize(size) {
+    document.getElementById("selectedSize").value = size;
+    let btns = document.querySelectorAll(".size-btn");
+    btns.forEach(btn => btn.classList.remove("active"));
+    document.getElementById("btn_" + size).classList.add("active");
+}
+function changeImage(link) { document.getElementById("mainImage").src = link; }
+</script>
 
 </body>
 </html>
