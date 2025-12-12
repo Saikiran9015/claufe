@@ -183,7 +183,8 @@
     <div class="slider-wrapper">
         <div class="slider">
             {% for b in banners %}
-            <img src="{{ url_for('uploaded_file', filename=b['image_filename']) }}" alt="Banner">
+            <img src="{{ b['image_filename'] if 'data:' in b['image_filename'] else url_for('uploaded_file', filename=b['image_filename']) }}"
+                alt="Banner">
             {% else %}
             <img src="https://via.placeholder.com/1920x600?text=No+Banners" alt="No Banner">
             {% endfor %}
