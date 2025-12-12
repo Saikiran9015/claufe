@@ -9,6 +9,7 @@ import razorpay
 import hmac
 import hashlib
 import json
+import base64
 
 from dotenv import load_dotenv
 from werkzeug.utils import secure_filename
@@ -636,11 +637,13 @@ def admin_banners():
         file = request.files.get("image")
 
         if file and allowed_file(file.filename):
-            filename = datetime.datetime.now().strftime("%Y%m%d%H%M%S") + "_" + secure_filename(file.filename)
-            file.save(os.path.join(app.config["UPLOAD_FOLDER"], filename))
+            # Convert to Base64
+            content_type = file.content_type
+            file_content = file.read()
+            base64_str = "data:" + content_type + ";base64," + base64.b64encode(file_content).decode('utf-8')
 
             banners_col.insert_one({
-                "image_filename": filename,
+                "image_filename": base64_str,
                 "created_at": datetime.datetime.now()
             })
 
@@ -766,9 +769,11 @@ def add_product():
 
             for file in image_files[:4]:
                 if file and allowed_file(file.filename):
-                    filename = datetime.datetime.now().strftime("%Y%m%d%H%M%S") + "_" + secure_filename(file.filename)
-                    file.save(os.path.join(app.config["UPLOAD_FOLDER"], filename))
-                    saved_images.append(filename)
+                    # Convert to Base64
+                    content_type = file.content_type
+                    file_content = file.read()
+                    base64_str = "data:" + content_type + ";base64," + base64.b64encode(file_content).decode('utf-8')
+                    saved_images.append(base64_str)
 
             if not saved_images:
                 flash("Upload at least one image", "error")

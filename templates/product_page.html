@@ -1,257 +1,271 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-<meta charset="UTF-8">
-<title>{{ p.name }}</title>
-<link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
-<style>
-    /* GLOBAL */
-body {
-    margin: 0;
-    background: #f5f5f7;
-    font-family: "Poppins", sans-serif;
-}
+    <meta charset="UTF-8">
+    <title>{{ p.name }}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <style>
+        /* GLOBAL */
+        body {
+            margin: 0;
+            background: #f5f5f7;
+            font-family: "Poppins", sans-serif;
+        }
 
-/* HEADER */
-.landing-header {
-    width: 100%;
-    padding: 18px 40px;
-    background: #ffffff;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    box-shadow: 0 3px 12px rgba(0,0,0,0.06);
-    position: sticky;
-    top: 0;
-    z-index: 10;
-}
+        /* HEADER */
+        .landing-header {
+            width: 100%;
+            padding: 18px 40px;
+            background: #ffffff;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 3px 12px rgba(0, 0, 0, 0.06);
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
 
-.landing-logo img {
-    width: 130px;
-}
+        .landing-logo img {
+            width: 130px;
+        }
 
-.landing-admin-link {
-    margin-left: 20px;
-    font-weight: 600;
-    color: #333;
-    text-decoration: none;
-    font-size: 16px;
-}
-.landing-admin-link:hover {
-    color: #6a35ff;
-}
+        .landing-admin-link {
+            margin-left: 20px;
+            font-weight: 600;
+            color: #333;
+            text-decoration: none;
+            font-size: 16px;
+        }
 
-/* PRODUCT PAGE */
-.page-wrapper {
-    width: 92%;
-    max-width: 1400px;
-    margin: 40px auto;
-    display: flex;
-    gap: 40px;
-}
+        .landing-admin-link:hover {
+            color: #6a35ff;
+        }
 
-/* LEFT SIDE IMAGES */
-.left-view {
-    flex: 1;
-}
+        /* PRODUCT PAGE */
+        .page-wrapper {
+            width: 92%;
+            max-width: 1400px;
+            margin: 40px auto;
+            display: flex;
+            gap: 40px;
+        }
 
-.main-image-box {
-    width: 100%;
-    height: 520px;
-    background: #fff;
-    border-radius: 20px;
-    overflow: hidden;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-.main-image-box img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-}
+        /* LEFT SIDE IMAGES */
+        .left-view {
+            flex: 1;
+        }
 
-.thumb-row {
-    display: flex;
-    gap: 12px;
-    margin-top: 18px;
-}
-.thumb-row img {
-    width: 80px;
-    height: 80px;
-    border-radius: 14px;
-    object-fit: cover;
-    cursor: pointer;
-    border: 2px solid #ddd;
-    transition: .3s ease-in-out;
-}
-.thumb-row img:hover {
-    border-color: #6a35ff;
-    transform: scale(1.05);
-}
+        .main-image-box {
+            width: 100%;
+            height: 520px;
+            background: #fff;
+            border-radius: 20px;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
 
-/* RIGHT SIDE INFO */
-.right-info {
-    flex: 1;
-}
+        .main-image-box img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
 
-h1 {
-    margin: 0;
-    font-size: 32px;
-    font-weight: 700;
-}
+        .thumb-row {
+            display: flex;
+            gap: 12px;
+            margin-top: 18px;
+        }
 
-.price-row {
-    margin: 20px 0;
-    font-size: 30px;
-    font-weight: 600;
-}
+        .thumb-row img {
+            width: 80px;
+            height: 80px;
+            border-radius: 14px;
+            object-fit: cover;
+            cursor: pointer;
+            border: 2px solid #ddd;
+            transition: .3s ease-in-out;
+        }
 
-.old-price {
-    margin-left: 12px;
-    color: #888;
-    text-decoration: line-through;
-}
+        .thumb-row img:hover {
+            border-color: #6a35ff;
+            transform: scale(1.05);
+        }
 
-/* SIZES */
-.size-box {
-    display: flex;
-    gap: 10px;
-    margin-top: 15px;
-}
+        /* RIGHT SIDE INFO */
+        .right-info {
+            flex: 1;
+        }
 
-.size-btn {
-    background: #fff;
-    padding: 10px 20px;
-    border-radius: 8px;
-    border: 2px solid #ccc;
-    font-weight: 600;
-    cursor: pointer;
-    transition: .3s;
-}
+        h1 {
+            margin: 0;
+            font-size: 32px;
+            font-weight: 700;
+        }
 
-.size-btn.active,
-.size-btn:hover {
-    border-color: #6a35ff;
-    background: #6a35ff;
-    color: white;
-}
+        .price-row {
+            margin: 20px 0;
+            font-size: 30px;
+            font-weight: 600;
+        }
 
-/* ADD BUTTON */
-.add-btn {
-    margin-top: 25px;
-    width: 100%;
-    padding: 15px;
-    border-radius: 12px;
-    border: none;
-    color: #fff;
-    background: #6a35ff;
-    font-size: 18px;
-    cursor: pointer;
-    transition: .4s;
-}
-.add-btn:hover {
-    background: #5527ff;
-    transform: scale(1.03);
-}
+        .old-price {
+            margin-left: 12px;
+            color: #888;
+            text-decoration: line-through;
+        }
 
-/* RESPONSIVE */
-@media screen and (max-width: 900px){
-    .page-wrapper {
-        flex-direction: column;
-    }
-    .landing-logo img {
-        width: 100px;
-    }
-}
+        /* SIZES */
+        .size-box {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
 
-</style>
+        .size-btn {
+            background: #fff;
+            padding: 10px 20px;
+            border-radius: 8px;
+            border: 2px solid #ccc;
+            font-weight: 600;
+            cursor: pointer;
+            transition: .3s;
+        }
+
+        .size-btn.active,
+        .size-btn:hover {
+            border-color: #6a35ff;
+            background: #6a35ff;
+            color: white;
+        }
+
+        /* ADD BUTTON */
+        .add-btn {
+            margin-top: 25px;
+            width: 100%;
+            padding: 15px;
+            border-radius: 12px;
+            border: none;
+            color: #fff;
+            background: #6a35ff;
+            font-size: 18px;
+            cursor: pointer;
+            transition: .4s;
+        }
+
+        .add-btn:hover {
+            background: #5527ff;
+            transform: scale(1.03);
+        }
+
+        /* RESPONSIVE */
+        @media screen and (max-width: 900px) {
+            .page-wrapper {
+                flex-direction: column;
+            }
+
+            .landing-logo img {
+                width: 100px;
+            }
+        }
+    </style>
 </head>
 
 <body>
 
-<header class="landing-header">
-    <div class="landing-logo">
-       <a href="{{ url_for('landing') }}">
-            <img src="{{ url_for('static', filename='3.png') }}" class="logo-img" alt="Logo">
-       </a>
-    </div>
-
-    <div>
-        <a href="{{ url_for('admin_dashboard') }}" class="landing-admin-link">Admin</a>
-        <a href="{{ url_for('cart') }}" class="landing-admin-link">Cart</a>
-    </div>
-</header>
-
-
-<div class="page-wrapper">
-
-    <!-- LEFT VIEW -->
-    <div class="left-view">
-        <div class="main-image-box">
-            <img id="mainImage" src="{{ url_for('uploaded_file', filename=p.images[0]) }}">
+    <header class="landing-header">
+        <div class="landing-logo">
+            <a href="{{ url_for('landing') }}">
+                <img src="{{ url_for('static', filename='3.png') }}" class="logo-img" alt="Logo">
+            </a>
         </div>
 
-        <div class="thumb-row">
-            {% for img in p.images %}
-                <img src="{{ url_for('uploaded_file', filename=img) }}" onclick="changeImage(this.src)">
-            {% endfor %}
+        <div>
+            <a href="{{ url_for('admin_dashboard') }}" class="landing-admin-link">Admin</a>
+            <a href="{{ url_for('cart') }}" class="landing-admin-link">Cart</a>
         </div>
-    </div>
-
-    <!-- RIGHT INFO -->
-    <div class="right-info">
-        <h1>{{ p.name }}</h1>
-
-        {% if p.rating %}
-        <div style="margin:6px 0; font-size:18px;">
-            ⭐ {{ p.rating }} / 5
-        </div>
-        {% endif %}
-
-        <p style="color:#444; max-width:500px; line-height:1.6;">
-            {{ p.description }}
-        </p>
-
-        <div class="price-row">
-            ₹{{ p.price }}
-            {% if p.old_price %}
-                <span class="old-price">₹{{ p.old_price }}</span>
-            {% endif %}
-        </div>
+    </header>
 
 
-        <form action="{{ url_for('add_to_cart', product_id=p._id) }}" method="POST">
-            
-            <h3>Select Size:</h3>
-            <div class="size-box">
-                {% for s in ["S","M","L","XL","XXL"] %}
-                    {% if s in p.sizes %}
-                        <button type="button" class="size-btn" id="btn_{{ s }}" onclick="selectSize('{{ s }}')">{{ s }}</button>
-                    {% endif %}
-                {% endfor %}
+    <div class="page-wrapper">
+
+        <!-- LEFT VIEW -->
+        <div class="left-view">
+            <div class="main-image-box">
+                {% if p.images and p.images|length > 0 %}
+                <img id="mainImage"
+                    src="{{ p.images[0] if 'data:' in p.images[0] else url_for('uploaded_file', filename=p.images[0]) }}">
+                {% else %}
+                <img id="mainImage" src="https://via.placeholder.com/600x600?text=No+Image">
+                {% endif %}
             </div>
 
-            <input type="hidden" name="size" id="selectedSize" value="M">
-            <input type="hidden" name="quantity" value="1">
+            <div class="thumb-row">
+                {% for img in p.images %}
+                <img src="{{ img if 'data:' in img else url_for('uploaded_file', filename=img) }}"
+                    onclick="changeImage(this.src)">
+                {% endfor %}
+            </div>
+        </div>
 
-            <button type="submit" class="add-btn">
-                Purchase Now
-            </button>
-        </form>
+        <!-- RIGHT INFO -->
+        <div class="right-info">
+            <h1>{{ p.name }}</h1>
+
+            {% if p.rating %}
+            <div style="margin:6px 0; font-size:18px;">
+                ⭐ {{ p.rating }} / 5
+            </div>
+            {% endif %}
+
+            <p style="color:#444; max-width:500px; line-height:1.6;">
+                {{ p.description }}
+            </p>
+
+            <div class="price-row">
+                ₹{{ p.price }}
+                {% if p.old_price %}
+                <span class="old-price">₹{{ p.old_price }}</span>
+                {% endif %}
+            </div>
+
+
+            <form action="{{ url_for('add_to_cart', product_id=p._id) }}" method="POST">
+
+                <h3>Select Size:</h3>
+                <div class="size-box">
+                    {% for s in ["S","M","L","XL","XXL"] %}
+                    {% if s in p.sizes %}
+                    <button type="button" class="size-btn" id="btn_{{ s }}" onclick="selectSize('{{ s }}')">{{ s
+                        }}</button>
+                    {% endif %}
+                    {% endfor %}
+                </div>
+
+                <input type="hidden" name="size" id="selectedSize" value="M">
+                <input type="hidden" name="quantity" value="1">
+
+                <button type="submit" class="add-btn">
+                    Purchase Now
+                </button>
+            </form>
+        </div>
+
     </div>
 
-</div>
-
-<script>
-function selectSize(size) {
-    document.getElementById("selectedSize").value = size;
-    let btns = document.querySelectorAll(".size-btn");
-    btns.forEach(btn => btn.classList.remove("active"));
-    document.getElementById("btn_" + size).classList.add("active");
-}
-function changeImage(link) { document.getElementById("mainImage").src = link; }
-</script>
+    <script>
+        function selectSize(size) {
+            document.getElementById("selectedSize").value = size;
+            let btns = document.querySelectorAll(".size-btn");
+            btns.forEach(btn => btn.classList.remove("active"));
+            document.getElementById("btn_" + size).classList.add("active");
+        }
+        function changeImage(link) { document.getElementById("mainImage").src = link; }
+    </script>
 
 </body>
+
 </html>

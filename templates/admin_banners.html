@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <title>Banners - Claufe.</title>
@@ -8,116 +9,116 @@
 
 <body class="admin-shell">
 
-<!-- HEADER -->
-<header class="admin-header">
-  <div class="landing-logo">
+  <!-- HEADER -->
+  <header class="admin-header">
+    <div class="landing-logo">
       <img src="{{ url_for('static', filename='4.png') }}" class="logo-img" alt="Logo">
-  </div>
+    </div>
 
-  <div>
-    {% if session.get('name') %}
+    <div>
+      {% if session.get('name') %}
       <span style="margin-right:12px;">
         {{ session.get('name') }} ({{ session.get('role') }})
       </span>
       <a href="{{ url_for('logout') }}" class="landing-admin-link">Logout</a>
-    {% endif %}
-  </div>
-</header>
+      {% endif %}
+    </div>
+  </header>
 
-<!-- BACK TO HOME -->
-<a href="{{ url_for('landing') }}">
-  <button class="btn btn-outline" style="margin-left:32px; margin-top:10px;">
+  <!-- BACK TO HOME -->
+  <a href="{{ url_for('landing') }}">
+    <button class="btn btn-outline" style="margin-left:32px; margin-top:10px;">
       ← Go to Home Page
-  </button>
-</a>
-
-<!-- NAVIGATION -->
-<nav class="admin-nav">
-
-  <a href="{{ url_for('admin_dashboard') }}">
-    <button class="admin-tab {{ 'active' if active_page=='dashboard' else '' }}">Dashboard</button>
+    </button>
   </a>
 
-  <a href="{{ url_for('admin_products') }}">
-    <button class="admin-tab {{ 'active' if active_page=='products' else '' }}">Products</button>
-  </a>
+  <!-- NAVIGATION -->
+  <nav class="admin-nav">
 
-  <a href="{{ url_for('add_product') }}">
-    <button class="admin-tab {{ 'active' if active_page=='upload' else '' }}">Product Images</button>
-  </a>
+    <a href="{{ url_for('admin_dashboard') }}">
+      <button class="admin-tab {{ 'active' if active_page=='dashboard' else '' }}">Dashboard</button>
+    </a>
 
-  <!-- FIXED: analytics → admin_analytics -->
-  <a href="{{ url_for('admin_analytics') }}">
-    <button class="admin-tab {{ 'active' if active_page=='analytics' else '' }}">Analytics</button>
-  </a>
+    <a href="{{ url_for('admin_products') }}">
+      <button class="admin-tab {{ 'active' if active_page=='products' else '' }}">Products</button>
+    </a>
 
-  <a href="{{ url_for('admin_banners') }}">
-    <button class="admin-tab {{ 'active' if active_page=='banners' else '' }}">Banners</button>
-  </a>
+    <a href="{{ url_for('add_product') }}">
+      <button class="admin-tab {{ 'active' if active_page=='upload' else '' }}">Product Images</button>
+    </a>
 
-</nav>
+    <!-- FIXED: analytics → admin_analytics -->
+    <a href="{{ url_for('admin_analytics') }}">
+      <button class="admin-tab {{ 'active' if active_page=='analytics' else '' }}">Analytics</button>
+    </a>
 
-<!-- MAIN CONTENT -->
-<main class="admin-content">
+    <a href="{{ url_for('admin_banners') }}">
+      <button class="admin-tab {{ 'active' if active_page=='banners' else '' }}">Banners</button>
+    </a>
 
-  <h2>Homepage Banner Upload (16:9 Image - 1920×1080)</h2>
+  </nav>
 
-  <!-- UPLOAD FORM -->
-  <div class="card" style="padding:25px; margin-bottom:30px;">
-    <form method="POST" enctype="multipart/form-data">
+  <!-- MAIN CONTENT -->
+  <main class="admin-content">
 
-      <label><b>Select Banner Image (Only 16:9)</b></label>
-      <input type="file" name="image" required class="input-file">
+    <h2>Homepage Banner Upload (16:9 Image - 1920×1080)</h2>
 
-      <p class="card-sub" style="margin-top:10px; line-height:1.5;">
-        ✔ Recommended size: <b>1920 × 1080 pixels</b><br>
-        ✔ Allowed formats: JPG, PNG, WEBP<br>
-        ✔ Max file size: <b>5 MB</b>
-      </p>
+    <!-- UPLOAD FORM -->
+    <div class="card" style="padding:25px; margin-bottom:30px;">
+      <form method="POST" enctype="multipart/form-data">
 
-      <button type="submit" class="btn btn-primary" style="margin-top:15px;">
-        Upload Banner
-      </button>
+        <label><b>Select Banner Image (Only 16:9)</b></label>
+        <input type="file" name="image" required class="input-file">
 
-    </form>
-  </div>
+        <p class="card-sub" style="margin-top:10px; line-height:1.5;">
+          ✔ Recommended size: <b>1920 × 1080 pixels</b><br>
+          ✔ Allowed formats: JPG, PNG, WEBP<br>
+          ✔ Max file size: <b>5 MB</b>
+        </p>
 
-  <h3>Uploaded Banners</h3>
+        <button type="submit" class="btn btn-primary" style="margin-top:15px;">
+          Upload Banner
+        </button>
 
-  <!-- BANNER LIST -->
-  <div class="card-grid">
-
-    {% for b in banners %}
-    <div class="card" style="padding:0; overflow:hidden;">
-
-      <!-- PREVIEW -->
-      <img src="{{ url_for('uploaded_file', filename=b['image_filename']) }}"
-           alt="Banner"
-           style="width:100%; height:auto; display:block;">
-
-      <!-- ACTIONS -->
-      <div style="padding:15px; display:flex; justify-content:space-between; align-items:center;">
-        <span class="card-sub">{{ b['image_filename'] }}</span>
-
-        <form method="POST"
-              action="{{ url_for('delete_banner', banner_id=b['_id']) }}"
-              onsubmit="return confirm('Delete this banner?');">
-
-          <button type="submit" class="btn btn-danger">Delete</button>
-        </form>
-      </div>
-
+      </form>
     </div>
 
-    {% else %}
+    <h3>Uploaded Banners</h3>
+
+    <!-- BANNER LIST -->
+    <div class="card-grid">
+
+      {% for b in banners %}
+      <div class="card" style="padding:0; overflow:hidden;">
+
+        <!-- PREVIEW -->
+        <img
+          src="{{ b['image_filename'] if 'data:' in b['image_filename'] else url_for('uploaded_file', filename=b['image_filename']) }}"
+          alt="Banner" style="width:100%; height:auto; display:block;">
+
+        <!-- ACTIONS -->
+        <div style="padding:15px; display:flex; justify-content:space-between; align-items:center;">
+          <span class="card-sub">{{ b['image_filename'] }}</span>
+
+          <form method="POST" action="{{ url_for('delete_banner', banner_id=b['_id']) }}"
+            onsubmit="return confirm('Delete this banner?');">
+
+            <button type="submit" class="btn btn-danger">Delete</button>
+          </form>
+        </div>
+
+      </div>
+
+      {% else %}
 
       <p style="text-align:center; width:100%;">No banners uploaded yet.</p>
 
-    {% endfor %}
+      {% endfor %}
 
-  </div>
+    </div>
 
-</main>
+  </main>
 
 </body>
+
 </html>

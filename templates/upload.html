@@ -156,6 +156,23 @@
       background: #6a35ff;
       color: white;
     }
+
+    /* Flash Messages */
+    .alert-box {
+      padding: 12px;
+      border-radius: 8px;
+      color: white;
+      margin-bottom: 10px;
+      font-size: 14px;
+    }
+
+    .alert-error {
+      background: #e74c3c;
+    }
+
+    .alert-success {
+      background: #2ecc71;
+    }
   </style>
 </head>
 
@@ -200,6 +217,19 @@
 
   <div class="admin-shell">
 
+    <!-- Flash Messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+    <div style="margin-bottom: 20px;">
+      {% for category, message in messages %}
+      <div class="alert-box {{ 'alert-error' if category == 'error' else 'alert-success' }}">
+        {{ message }}
+      </div>
+      {% endfor %}
+    </div>
+    {% endif %}
+    {% endwith %}
+
     <div class="top-bar">
       <h1>Add New Product</h1>
       <a href="{{ url_for('admin_dashboard') }}" class="link-back">← Back to Dashboard</a>
@@ -235,9 +265,11 @@
           <label class="image-upload-box">
             <span class="plus">+</span>
             <div>Click to choose up to 4 images</div>
-            <input type="file" name="images" accept="image/*" multiple required
+            <input type="file" name="images" id="imageInput" accept="image/*" multiple required
               style="opacity: 0; position: absolute; z-index: -1; width: 0; height: 0;">
           </label>
+          <!-- Preview Container -->
+          <div id="previewContainer" style="display: flex; gap: 10px; flex-wrap: wrap; margin-top: 15px;"></div>
         </div>
       </div>
 
@@ -281,6 +313,33 @@
 
     </form>
   </div>
+
+  <script>
+    const imageInput = document.getElementById('imageInput');
+    const previewContainer = document.getElementById('previewContainer');
+
+    imageInput.addEventListener('change', function () {
+      previewContainer.innerHTML = ''; // Clear previous previews
+      const files = Array.from(this.files).slice(0, 4); // Limit to 4
+
+      files.forEach(file => {
+        if (file) {
+          const reader = new FileReader();
+          reader.onload = function (e) {
+            const img = document.createElement('img');
+            img.src = e.target.result;
+            img.style.width = '80px';
+            img.style.height = '80px';
+            img.style.objectFit = 'cover';
+            img.style.borderRadius = '8px';
+            img.style.border = '1px solid #ddd';
+            previewContainer.appendChild(img);
+          }
+          reader.readAsDataURL(file);
+        }
+      });
+    });
+  </script>
 
 </body>
 

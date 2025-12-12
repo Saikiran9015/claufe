@@ -1,193 +1,191 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <title>Your Cart - Claufe.</title>
   <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
 
-<style>
+  <style>
+    body {
+      background: #f4f5fb;
+      font-family: 'Poppins', sans-serif;
+    }
 
-body{
-    background:#f4f5fb;
-    font-family:'Poppins',sans-serif;
-}
+    .cart-wrapper {
+      max-width: 900px;
+      margin: 50px auto;
+      padding: 20px;
+    }
 
-.cart-wrapper{
-    max-width:900px;
-    margin:50px auto;
-    padding:20px;
-}
+    .cart-title {
+      font-size: 34px;
+      font-weight: 700;
+      letter-spacing: -1px;
+      margin-bottom: 25px;
+      color: #362463;
+    }
 
-.cart-title{
-    font-size:34px;
-    font-weight:700;
-    letter-spacing:-1px;
-    margin-bottom:25px;
-    color:#362463;
-}
+    .cart-item {
+      display: flex;
+      gap: 25px;
+      background: white;
+      padding: 25px;
+      border-radius: 20px;
+      box-shadow: 0 5px 25px rgba(0, 0, 0, .08);
+      margin-bottom: 25px;
+      transition: .3s;
+    }
 
-.cart-item{
-    display:flex;
-    gap:25px;
-    background:white;
-    padding:25px;
-    border-radius:20px;
-    box-shadow:0 5px 25px rgba(0,0,0,.08);
-    margin-bottom:25px;
-    transition:.3s;
-}
-.cart-item:hover{
-    transform:translateY(-3px);
-}
+    .cart-item:hover {
+      transform: translateY(-3px);
+    }
 
-.cart-item img{
-    width:150px;
-    height:150px;
-    border-radius:15px;
-    object-fit:cover;
-    box-shadow:0 5px 18px rgba(0,0,0,0.07);
-}
+    .cart-item img {
+      width: 150px;
+      height: 150px;
+      border-radius: 15px;
+      object-fit: cover;
+      box-shadow: 0 5px 18px rgba(0, 0, 0, 0.07);
+    }
 
-.item-name{
-    font-size:22px;
-    font-weight:600;
-}
+    .item-name {
+      font-size: 22px;
+      font-weight: 600;
+    }
 
-.item-price{
-    font-size:20px;
-    font-weight:600;
-    margin:10px 0;
-    color:#6A35FF;
-}
+    .item-price {
+      font-size: 20px;
+      font-weight: 600;
+      margin: 10px 0;
+      color: #6A35FF;
+    }
 
-.qty-size-row{
-    display:flex;
-    gap:25px;
-    align-items:center;
-}
+    .qty-size-row {
+      display: flex;
+      gap: 25px;
+      align-items: center;
+    }
 
-select,input[type=number]{
-    padding:10px 12px;
-    border-radius:10px;
-    border:1px solid #dadbee;
-    font-size:15px;
-    width:130px;
-    background:white;
-    box-shadow:0 3px 10px rgba(0,0,0,.04);
-}
+    select,
+    input[type=number] {
+      padding: 10px 12px;
+      border-radius: 10px;
+      border: 1px solid #dadbee;
+      font-size: 15px;
+      width: 130px;
+      background: white;
+      box-shadow: 0 3px 10px rgba(0, 0, 0, .04);
+    }
 
-.remove-btn{
-    background:#ff4b4b;
-    padding:10px 20px;
-    border:none;
-    border-radius:10px;
-    color:white;
-    font-weight:600;
-    cursor:pointer;
-    transition:.2s;
-}
-.remove-btn:hover{
-    background:#e03636;
-}
+    .remove-btn {
+      background: #ff4b4b;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 10px;
+      color: white;
+      font-weight: 600;
+      cursor: pointer;
+      transition: .2s;
+    }
 
-.pay-btn{
-    background:#6A35FF;
-    width:100%;
-    padding:18px;
-    border:none;
-    font-size:20px;
-    color:white;
-    border-radius:12px;
-    cursor:pointer;
-    font-weight:600;
-    box-shadow:0 4px 15px rgba(106,53,255,.3);
-    transition:.3s;
-}
-.pay-btn:hover{
-    background:#5a2dd7;
-}
+    .remove-btn:hover {
+      background: #e03636;
+    }
 
-.cart-footer{
-    font-size:24px;
-    font-weight:700;
-    text-align:right;
-    margin-top:25px;
-    letter-spacing:-0.5px;
-    color:#362463;
-}
+    .pay-btn {
+      background: #6A35FF;
+      width: 100%;
+      padding: 18px;
+      border: none;
+      font-size: 20px;
+      color: white;
+      border-radius: 12px;
+      cursor: pointer;
+      font-weight: 600;
+      box-shadow: 0 4px 15px rgba(106, 53, 255, .3);
+      transition: .3s;
+    }
 
-</style>
+    .pay-btn:hover {
+      background: #5a2dd7;
+    }
+
+    .cart-footer {
+      font-size: 24px;
+      font-weight: 700;
+      text-align: right;
+      margin-top: 25px;
+      letter-spacing: -0.5px;
+      color: #362463;
+    }
+  </style>
 
 </head>
+
 <body>
 
-<header class="landing-header">
+  <header class="landing-header">
     <div class="landing-logo">
-        <img src="{{ url_for('static', filename='4.png') }}" class="logo-img" alt="Logo">
+      <img src="{{ url_for('static', filename='4.png') }}" class="logo-img" alt="Logo">
     </div>
 
     <a href="{{ url_for('landing') }}" class="landing-admin-link">← Back</a>
-</header>
+  </header>
 
-<div class="cart-wrapper">
+  <div class="cart-wrapper">
 
-  <h2 class="cart-title">Your Cart</h2>
+    <h2 class="cart-title">Your Cart</h2>
 
-  {% if items %}
+    {% if items %}
     {% for item in items %}
-      <div class="cart-item">
+    <div class="cart-item">
 
-        <img src="{{ url_for('uploaded_file', filename=item.image) }}" alt="product">
+      <img src="{{ item.image if 'data:' in item.image else url_for('uploaded_file', filename=item.image) }}"
+        alt="product">
 
-        <div class="item-info">
+      <div class="item-info">
 
-          <div class="item-name">{{ item.name }}</div>
-          
-          <div class="item-price">
-            ₹<span class="price"
-                 id="price-{{ item._id }}"
-                 data-base="{{ item.price }}">
-                {{ item.price * item.quantity }}
-            </span>
-          </div>
+        <div class="item-name">{{ item.name }}</div>
 
-          <!-- UPDATE CART ITEM -->
-          <form action="{{ url_for('update_cart_item', item_id=item['_id']) }}"
-                method="POST" class="update-form">
-            
-            <div class="qty-size-row">
+        <div class="item-price">
+          ₹<span class="price" id="price-{{ item._id }}" data-base="{{ item.price }}">
+            {{ item.price * item.quantity }}
+          </span>
+        </div>
 
-              <div>
-                <label>Size</label><br>
-                <select name="size" data-item="{{ item._id }}" class="size-select" required>
-                  <option value="S" {% if item.size=='S' %}selected{% endif %}>S</option>
-                  <option value="M" {% if item.size=='M' %}selected{% endif %}>M</option>
-                  <option value="L" {% if item.size=='L' %}selected{% endif %}>L</option>
-                  <option value="XL" {% if item.size=='XL' %}selected{% endif %}>XL</option>
-                  <option value="XXL" {% if item.size=='XXL' %}selected{% endif %}>XXL</option>
-                </select>
-              </div>
+        <!-- UPDATE CART ITEM -->
+        <form action="{{ url_for('update_cart_item', item_id=item['_id']) }}" method="POST" class="update-form">
 
-              <div>
-                <label>Qty</label><br>
-                <input type="number" name="quantity" min="1" 
-                       value="{{ item.quantity }}" required>
-              </div>
+          <div class="qty-size-row">
 
+            <div>
+              <label>Size</label><br>
+              <select name="size" data-item="{{ item._id }}" class="size-select" required>
+                <option value="S" {% if item.size=='S' %}selected{% endif %}>S</option>
+                <option value="M" {% if item.size=='M' %}selected{% endif %}>M</option>
+                <option value="L" {% if item.size=='L' %}selected{% endif %}>L</option>
+                <option value="XL" {% if item.size=='XL' %}selected{% endif %}>XL</option>
+                <option value="XXL" {% if item.size=='XXL' %}selected{% endif %}>XXL</option>
+              </select>
             </div>
 
-            <button type="submit"
-                    class="update-btn"
-                    style="display:none;">Update</button>
-          </form>
+            <div>
+              <label>Qty</label><br>
+              <input type="number" name="quantity" min="1" value="{{ item.quantity }}" required>
+            </div>
 
-          <!-- DELETE CART ITEM -->
-          <form action="{{ url_for('delete_cart_item', item_id=item['_id']) }}"
-                method="POST" style="margin-top:10px;">
-              <button type="submit" class="remove-btn">Remove</button>
-          </form>
+          </div>
 
-        </div>
+          <button type="submit" class="update-btn" style="display:none;">Update</button>
+        </form>
+
+        <!-- DELETE CART ITEM -->
+        <form action="{{ url_for('delete_cart_item', item_id=item['_id']) }}" method="POST" style="margin-top:10px;">
+          <button type="submit" class="remove-btn">Remove</button>
+        </form>
+
       </div>
+    </div>
     {% endfor %}
 
     <!-- PAYMENT BUTTON -->
@@ -199,49 +197,50 @@ select,input[type=number]{
       Total: ₹{{ total }}
     </div>
 
-  {% else %}
+    {% else %}
     <p>Your cart is empty.</p>
-  {% endif %}
+    {% endif %}
 
-</div>
+  </div>
 
 
-<!-- JS SECTION -->
-<script>
+  <!-- JS SECTION -->
+  <script>
 
-function updateTotals() {
-    let total = 0;
+    function updateTotals() {
+      let total = 0;
 
-    document.querySelectorAll(".cart-item").forEach(item=>{
+      document.querySelectorAll(".cart-item").forEach(item => {
         let priceSpan = item.querySelector(".price");
-        let qtyInput  = item.querySelector("input[name='quantity']");
-        let base      = parseFloat(priceSpan.dataset.base);
-        let qty       = parseInt(qtyInput.value);
+        let qtyInput = item.querySelector("input[name='quantity']");
+        let base = parseFloat(priceSpan.dataset.base);
+        let qty = parseInt(qtyInput.value);
 
         let newPrice = base * qty;
-        
+
         priceSpan.innerHTML = newPrice.toFixed(2);
 
         total += newPrice;
-    });
+      });
 
-    document.querySelector(".cart-footer").innerHTML =
+      document.querySelector(".cart-footer").innerHTML =
         "Total: ₹" + total.toFixed(2);
-}
+    }
 
-document.querySelectorAll("input[name='quantity']").forEach(input=>{
-    input.addEventListener("input", updateTotals);
-});
-
-updateTotals();
-
-document.querySelectorAll(".size-select").forEach(select=>{
-    select.addEventListener("change",()=>{
-        select.closest("form").submit();
+    document.querySelectorAll("input[name='quantity']").forEach(input => {
+      input.addEventListener("input", updateTotals);
     });
-});
 
-</script>
+    updateTotals();
+
+    document.querySelectorAll(".size-select").forEach(select => {
+      select.addEventListener("change", () => {
+        select.closest("form").submit();
+      });
+    });
+
+  </script>
 
 </body>
+
 </html>
