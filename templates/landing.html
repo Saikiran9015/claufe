@@ -592,34 +592,138 @@ body {
 .poster-grid::-webkit-scrollbar { display: none; }
 .poster-grid { -ms-overflow-style: none; scrollbar-width: none; }
 
+/* ================= SNITCH NAV + SLIDE SIDEBAR (scoped) ================= */
+.snitch-navbar * { box-sizing: border-box; }
+.snitch-navbar {
+        height: 70px;
+        padding: 0 20px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        border-bottom: 1px solid #eee;
+        background: #fff;
+        position: relative;
+        z-index: 1200;
+}
+.snitch-menu-icon { font-size: 26px; cursor: pointer; }
+.snitch-logo { font-size: 20px; font-weight: 700; letter-spacing: 2px; }
+.snitch-nav-right { display:flex; align-items:center; gap:12px; }
+.snitch-search input { padding:8px 12px; border-radius:18px; border:1px solid #ddd; }
+.snitch-icons span { font-size:20px; cursor:pointer; margin-left:8px; }
+
+/* ICONS + LOGO LAYOUT */
+.snitch-icons {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+.snitch-icons a {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 10px;
+    border-radius: 10px;
+    color: #0b1220;
+    text-decoration: none;
+    background: transparent;
+    font-weight: 600;
+    transition: background .15s ease, color .15s ease, transform .12s ease;
+}
+.snitch-icons a:hover {
+    background: rgba(10,124,255,0.08);
+    color: #0a7cff;
+    transform: translateY(-1px);
+}
+
+.snitch-logo {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2px 8px;
+}
+.snitch-logo .logo-img {
+    height: 34px;
+    width: auto;
+    display: block;
+}
+
+@media (max-width: 700px) {
+    .snitch-icons a { padding: 6px 8px; font-size: 14px; }
+    .snitch-logo .logo-img { height: 28px; }
+    /* Show search on mobile and allow it to shrink/grow */
+    .snitch-search { display: block; flex: 1 1 auto; min-width: 120px; }
+    .snitch-search input { width: 100%; padding: 8px 10px; font-size: 14px; }
+    .snitch-nav-right { gap: 8px; align-items: center; }
+    /* compact icons */
+    .snitch-icons { gap: 6px; }
+}
+
+.slide-sidebar {
+        position: fixed;
+        top: 0;
+        left: -320px;
+        width: 320px;
+        height: 100vh;
+        background: #fff;
+        box-shadow: 6px 0 18px rgba(0,0,0,0.12);
+        transition: 0.36s ease;
+        z-index: 1400;
+        overflow-y: auto;
+}
+.slide-sidebar.active { left: 0; }
+.slide-sidebar .sidebar-header { padding:16px; font-size:18px; font-weight:700; border-bottom:1px solid #f0f0f0; display:flex; justify-content:space-between; }
+.slide-sidebar .category { padding:14px 16px; border-bottom:1px solid #f6f6f6; font-weight:600; cursor:pointer; }
+.slide-sidebar .category:hover { background:#fafafa; }
+
+.slide-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.45); opacity: 0; pointer-events: none; transition: 0.28s; z-index:1300; }
+.slide-overlay.active { opacity: 1; pointer-events: all; }
+
+@media (max-width: 700px) {
+    .snitch-logo { font-size:18px; }
+    .slide-sidebar { width: 86%; }
+}
+
 </style>
 
 </head>
 
 <body>
 
-<!-- ================= HEADER ================= -->
-<header class="site-header">
-    <div class="header-left">
-        <img src="{{ url_for('static', filename='3.png') }}" alt="Claufe Logo">
+<!-- Slide sidebar (overlay) + snitch-style navbar (only for landing) -->
+<div class="slide-sidebar" id="slideSidebar" aria-hidden="true">
+    <div class="sidebar-header">
+        CATEGORIES
+        <span class="close-btn" onclick="toggleMenu()">✕</span>
     </div>
 
-    <nav class="menu" id="menu">
-        <a href="{{ url_for('admin_dashboard') }}">Admin</a>
-        <a href="{{ url_for('cart') }}">Cart</a>
+    <a href="{{ url_for('category_view', category='BESTSELLERS') }}" class="category {{ 'active' if selected_category and selected_category|lower == 'bestsellers' else '' }}">BESTSELLERS</a>
+    <a href="{{ url_for('category_view', category='NEW') }}" class="category {{ 'active' if selected_category and selected_category|lower == 'new' else '' }}">NEW</a>
+    <a href="{{ url_for('category_view', category='SHIRTS') }}" class="category {{ 'active' if selected_category and selected_category|lower == 'shirts' else '' }}">SHIRTS</a>
+    <a href="{{ url_for('category_view', category='JACKETS') }}" class="category {{ 'active' if selected_category and selected_category|lower == 'jackets' else '' }}">JACKETS</a>
+    <a href="{{ url_for('category_view', category='JEANS') }}" class="category {{ 'active' if selected_category and selected_category|lower == 'jeans' else '' }}">JEANS</a>
+    <a href="{{ url_for('category_view', category='SWEATERS') }}" class="category {{ 'active' if selected_category and selected_category|lower == 'sweaters' else '' }}">SWEATERS</a>
+    <a href="{{ url_for('category_view', category='T-SHIRTS') }}" class="category {{ 'active' if selected_category and selected_category|lower == 't-shirts' else '' }}">T-SHIRTS</a>
+    <a href="{{ url_for('category_view', category='HOODIES & SWEATSHIRTS') }}" class="category {{ 'active' if selected_category and selected_category|lower == 'hoodies & sweatshirts' else '' }}">HOODIES &amp; SWEATSHIRTS</a>
+</div>
 
-        {% if session.get('email') %}
-        <a href="{{ url_for('logout') }}">Logout</a>
-        {% else %}
-        <a href="{{ url_for('login') }}">Login</a>
-        <a href="{{ url_for('signup') }}">Signup</a>
-        {% endif %}
-    </nav>
+<div class="slide-overlay" id="slideOverlay" onclick="toggleMenu()" aria-hidden="true"></div>
 
-    <div class="hamburger" onclick="toggleMenu()">
-        <span></span>
-        <span></span>
-        <span></span>
+<header class="snitch-navbar">
+    <div class="snitch-menu-icon" onclick="toggleMenu()">☰</div>
+    <div class="snitch-logo"><img src="{{ url_for('static', filename='4.png') }}" class="logo-img" alt="Logo"></div>
+
+    <div class="snitch-nav-right">
+        <div class="snitch-search">
+            <input id="searchInput" type="text" placeholder="Search 'Jackets'">
+        </div>
+        <div class="snitch-icons">
+            {% if session.get('email') %}
+                <a href="{{ url_for('logout') }}" title="Account">Logout</a>
+            {% else %}
+                <a href="{{ url_for('login') }}" title="Login">Login</a>
+            {% endif %}
+            <a href="{{ url_for('cart') }}" title="Cart">Cart</a>
+        </div>
     </div>
 </header>
 
@@ -708,7 +812,11 @@ body {
 
 <script>
 function toggleMenu() {
-    document.getElementById("menu").classList.toggle("show");
+    const sb = document.getElementById('slideSidebar');
+    const so = document.getElementById('slideOverlay');
+    if (!sb || !so) return;
+    sb.classList.toggle('active');
+    so.classList.toggle('active');
 }
 </script>
 
@@ -744,6 +852,84 @@ function toggleMenu() {
 <script>
 // set dynamic year in footer
 document.getElementById('year').textContent = new Date().getFullYear();
+</script>
+
+<script>
+// Live product search: debounce input, fetch /search?q= and re-render product grid
+(function(){
+    const input = document.getElementById('searchInput');
+    const grid = document.querySelector('.product-grid');
+    if (!input || !grid) return;
+
+    let timer = null;
+
+    function renderProducts(items){
+        if (!items || items.length === 0){
+            grid.innerHTML = '<p style="grid-column:1/-1;text-align:center;">No products found.</p>';
+            return;
+        }
+
+        grid.innerHTML = items.map(p => {
+            const img = p.image_url || 'https://via.placeholder.com/400x300?text=No+Image';
+            const desc = p.description ? escapeHtml(p.description).slice(0,160) + (p.description.length>160? '...':'') : '';
+            const sizes = (p.sizes || []).map(s => `<span style="display:inline-block;margin-right:6px;padding:6px 8px;border-radius:8px;background:#f1f5f9;font-size:12px;">${escapeHtml(s)}</span>`).join('');
+            return (`<article class="product-card">
+                <a href="${p.product_url}">
+                    <img src="${img}" alt="${escapeHtml(p.name)}">
+                </a>
+                <div class="product-body">
+                    <div class="product-name">${escapeHtml(p.name)}</div>
+                    <div class="product-price">₹${p.price}</div>
+                    <div class="small-muted" style="margin:8px 0;color:#666;font-size:13px;">${desc}</div>
+                    <div style="margin-bottom:8px;">${sizes}</div>
+                    <div style="display:flex;gap:8px;">
+                      <a href="${p.product_url}" class="btn" style="flex:1;">View</a>
+                      <a href="/add-to-cart/${p.product_id}" class="btn" style="flex:1;background:#fff;color:#0a7cff;border:1px solid rgba(10,124,255,0.12);">Add</a>
+                    </div>
+                </div>
+            </article>`);
+        }).join('');
+    }
+
+    function escapeHtml(s){
+        if (!s) return '';
+        return String(s).replace(/[&<>"']/g, function(c){
+            return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":"&#39;"}[c];
+        });
+    }
+
+    async function doSearch(q){
+        try{
+            const resp = await fetch('/search?q=' + encodeURIComponent(q));
+            if (!resp.ok) return;
+            const data = await resp.json();
+            renderProducts(data.products || []);
+        }catch(e){
+            console.error('Search error', e);
+        }
+    }
+
+    input.addEventListener('input', function(e){
+        const q = e.target.value.trim();
+        if (timer) clearTimeout(timer);
+        timer = setTimeout(()=> doSearch(q), 300);
+        if (q === ''){
+            // if cleared, fetch default server list (or show initial content)
+            timer = setTimeout(()=> doSearch(''), 200);
+        }
+    });
+
+    // On Enter, go to the category page for the query
+    input.addEventListener('keydown', function(e){
+        if (e.key === 'Enter'){
+            const q = e.target.value.trim();
+            if (!q) return;
+            // navigate to category view (server handles case-insensitive match)
+            window.location.href = '/category/' + encodeURIComponent(q);
+        }
+    });
+
+})();
 </script>
 
 <script>

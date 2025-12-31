@@ -2,6 +2,7 @@ from flask import (
     Flask, render_template, request, redirect,
     url_for, flash, session, send_from_directory, jsonify, Response
 )
+import re
 import os
 import datetime
 import requests
@@ -372,7 +373,15 @@ def require_admin():
 # =====================================================
 @app.route("/")
 def landing():
-    products = list(products_col.find().sort("created_at", -1))
+    # allow optional category filter via query param `?category=...`
+    category_q = request.args.get('category') or None
+    if category_q:
+        try:
+            products = list(products_col.find({"category": {"$regex": f"^{re.escape(category_q)}$", "$options": "i"}}).sort("created_at", -1))
+        except Exception:
+            products = list(products_col.find().sort("created_at", -1))
+    else:
+        products = list(products_col.find().sort("created_at", -1))
     raw_banners = list(banners_col.find().sort("created_at", -1))
     banners = []
     for b in raw_banners:
@@ -478,8 +487,68 @@ def landing():
         "landing.html",
         products=products,
         banners=banners,
+        selected_category=category_q,
         posters=posters
     )
+
+
+@app.route("/category/<string:category>")
+def category_view(category):
+    # Render a dedicated category page showing products for `category` (case-insensitive)
+    try:
+        products = list(products_col.find({"category": {"$regex": f"^{re.escape(category)}$", "$options": "i"}}).sort("created_at", -1))
+    except Exception:
+        products = list(products_col.find().sort("created_at", -1))
+
+    return render_template("category.html", products=products, category=category)
+
+
+# =====================================================
+# JSON Search Endpoint
+# Returns a small JSON list of matching products for live search
+# Query param: `q`
+@app.route("/search")
+def search_products():
+    q = (request.args.get("q") or "").strip()
+    try:
+        if not q:
+            raw = list(products_col.find().sort("created_at", -1).limit(100))
+        else:
+            # search by name or category (case-insensitive substring)
+            regex = {"$regex": re.escape(q), "$options": "i"}
+            raw = list(products_col.find({"$or": [{"name": regex}, {"category": regex}]}).sort("created_at", -1).limit(200))
+
+        results = []
+        for p in raw:
+            pid = str(p.get("_id"))
+            # determine image url or data URI
+            img = p.get("image_filename") or p.get("image") or None
+            if isinstance(img, str) and img.startswith("data:"):
+                image_url = img
+            elif isinstance(img, str) and img:
+                try:
+                    image_url = url_for("uploaded_file", filename=img)
+                except Exception:
+                    image_url = url_for("static", filename="no_image.png")
+            else:
+                image_url = url_for("static", filename="no_image.png")
+
+            results.append({
+                "_id": pid,
+                "name": p.get("name"),
+                "price": p.get("price"),
+                "description": p.get("description", ""),
+                "sizes": p.get("sizes", []),
+                "stock": p.get("stock", {}),
+                "image_url": image_url,
+                "product_url": url_for("product_page", product_id=pid),
+                "product_id": pid
+            })
+
+        return jsonify({"products": results})
+    except Exception as e:
+        print("Search error:", e)
+        return jsonify({"products": []})
 
 
 @app.route("/uploads/<path:filename>")
@@ -1727,6 +1796,8 @@ def add_product():
             price_raw = request.form.get("price", "").strip()
             old_price_raw = request.form.get("old_price", "").strip()
             description = request.form.get("description", "").strip()
+            # category (optional)
+            category = request.form.get("category", "").strip()
             selected_sizes = request.form.getlist("sizes")
 
             if not name or not price_raw:
@@ -1785,6 +1856,7 @@ def add_product():
             products_col.insert_one({
                 "name": name,
                 "description": description,
+                "category": category,
                 "price": price,
                 "old_price": old_price,
                 "image_filename": main_image,

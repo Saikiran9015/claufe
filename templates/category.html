@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>{{ category }} – Claufe.</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+
+<header class="snitch-navbar">
+    <div class="snitch-menu-icon" onclick="location.href='{{ url_for('landing') }}'">←</div>
+    <div class="snitch-logo"><img src="{{ url_for('static', filename='4.png') }}" class="logo-img" alt="Logo"></div>
+    <div style="flex:1"></div>
+</header>
+
+<section class="category-page">
+  <div class="category-header">
+    <div>
+      <div class="category-title">{{ category }}</div>
+      <div class="category-sub">Products in '{{ category }}' category — {{ products|length }} item{{ 's' if products|length != 1 else '' }}</div>
+    </div>
+
+    <div>
+      <a href="{{ url_for('landing') }}" class="btn btn-outline">All Products</a>
+    </div>
+  </div>
+
+  <section class="category-grid">
+    {% for p in products %}
+    <article class="category-card {{ 'horizontal' if loop.index0 % 2 == 0 else '' }}">
+        <a href="{{ url_for('product_page', product_id=p['_id']) }}">
+            {% if p['image_filename'] %}
+            <img src="{{ p['image_filename'] if 'data:' in p['image_filename'] else url_for('uploaded_file', filename=p['image_filename']) }}" alt="{{ p['name'] }}">
+            {% else %}
+            <img src="https://via.placeholder.com/800x600?text=No+Image" alt="No Image">
+            {% endif %}
+        </a>
+
+        <div class="product-body">
+            <div class="product-name">{{ p['name'] }}</div>
+            <div class="product-price">₹{{ p['price'] }}</div>
+            <div class="small-muted">{{ p.get('description','')|truncate(120) }}</div>
+
+            <div style="margin-top:12px;display:flex;gap:10px;">
+              <a href="{{ url_for('product_page', product_id=p['_id']) }}" class="btn btn-primary">View</a>
+              <form action="{{ url_for('add_to_cart', product_id=p['_id']) }}" method="POST" style="margin:0;">
+                <button type="submit" class="btn btn-outline">Add to Cart</button>
+              </form>
+            </div>
+        </div>
+    </article>
+    {% else %}
+    <p style="grid-column:1/-1;text-align:center;">No products in this category.</p>
+    {% endfor %}
+  </section>
+</section>
+
+</body>
+</html>
